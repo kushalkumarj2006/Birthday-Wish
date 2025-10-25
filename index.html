@@ -99,7 +99,7 @@
     function fillTemplate(template, data) {
       for (let key in data) {
         const regex = new RegExp(`{{${key}}}`, "g");
-        template = template.replace(regex, data[key]);
+        template = template.replaceAll(regex, data[key]);
       }
       return template;
     }
