@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Birthday Card Generator | Kushal</title>
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: #0d1117;
+      color: #c9d1d9;
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    h1 {
+      color: #58a6ff;
+    }
+
+    .container {
+      background: #161b22;
+      padding: 30px;
+      border-radius: 12px;
+      border: 1px solid #30363d;
+      max-width: 500px;
+      width: 90%;
+    }
+
+    input[type="text"],
+    textarea {
+      background: #0d1117;
+      color: #f0f6fc;
+      border: 1px solid #30363d;
+      padding: 12px;
+      border-radius: 8px;
+      width: 100%;
+      font-size: 15px;
+      outline: none;
+      margin-bottom: 15px;
+      box-sizing: border-box;
+    }
+
+    textarea {
+      height: 120px;
+      resize: vertical;
+    }
+
+    .file-upload {
+      border: 2px dashed #30363d;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      margin-bottom: 15px;
+      transition: border-color 0.3s;
+    }
+
+    .file-upload:hover {
+      border-color: #58a6ff;
+    }
+
+    button {
+      background: #238636;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.2s;
+      width: 100%;
+    }
+
+    button:hover {
+      background: #2ea043;
+    }
+
+    img {
+      max-width: 250px;
+      border-radius: 10px;
+      border: 2px solid #30363d;
+      margin-top: 10px;
+      display: none;
+    }
+
+    footer {
+      margin-top: 30px;
+      font-size: 14px;
+      color: #8b949e;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #c9d1d9;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>🎂 Birthday Card Generator</h1>
+
+    <div class="form-group">
+      <label for="friendName">Friend's Name:</label>
+      <input type="text" id="friendName" placeholder="Enter your friend's name" />
+    </div>
+
+    <div class="form-group">
+      <label for="filenameInput">File Name:</label>
+      <input type="text" id="filenameInput" placeholder="birthday_card" value="birthday_card" />
+    </div>
+
+    <div class="form-group">
+      <label>Upload Photo:</label>
+      <div class="file-upload" onclick="document.getElementById('imgInput').click()">
+        Click to upload or drag & drop a photo
+      </div>
+      <input type="file" id="imgInput" accept="image/*" style="display:none" />
+      <img id="preview" alt="Preview Image">
+    </div>
+
+    <div class="form-group">
+      <label for="message">Special Message (separate lines with Enter):</label>
+      <textarea id="message" placeholder="Write your birthday message here...">Happy Birthday, my friend!
+
+Wishing you all the happiness and success in the world.
+
+Hope your day is as amazing as you are!
+
+May all your dreams come true this year.</textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="signature">Your Signature:</label>
+      <input type="text" id="signature" placeholder="Your friend" value="Your friend" />
+    </div>
+
+    <button onclick="generateHTML()">Generate Birthday Card</button>
+  </div>
+
+  <footer>Built by Kushal 👑</footer>
+
+  <script>
+    let base64Image = "";
+
+    // Convert uploaded image to Base64
+    document.getElementById('imgInput').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        base64Image = evt.target.result;
+        const img = document.getElementById('preview');
+        img.src = base64Image;
+        img.style.display = "block";
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Allow drag and drop
+    const fileUpload = document.querySelector('.file-upload');
+    fileUpload.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      fileUpload.style.borderColor = '#58a6ff';
+    });
+
+    fileUpload.addEventListener('dragleave', () => {
+      fileUpload.style.borderColor = '#30363d';
+    });
+
+    fileUpload.addEventListener('drop', (e) => {
+      e.preventDefault();
+      fileUpload.style.borderColor = '#30363d';
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) {
+        document.getElementById('imgInput').files = e.dataTransfer.files;
+        const event = new Event('change');
+        document.getElementById('imgInput').dispatchEvent(event);
+      }
+    });
+
+    // Generate the HTML file
+    async function generateHTML() {
+      const friendName = document.getElementById('friendName').value.trim();
+      const filename = document.getElementById('filenameInput').value.trim() || "birthday_card";
+      const message = document.getElementById('message').value.trim();
+      const signature = document.getElementById('signature').value.trim();
+
+      if (!friendName) {
+        alert("Please enter your friend's name!");
+        return;
+      }
+
+      if (!base64Image) {
+        alert("Please upload an image first!");
+        return;
+      }
+
+      if (!message) {
+        alert("Please write a birthday message!");
+        return;
+      }
+
+      try {
+        const res = await fetch("template.html");
+        let template = await res.text();
+
+        // Process message into paragraphs
+        const messageParagraphs = message.split('\n')
+          .filter(line => line.trim())
+          .map(line => `<p>${line}</p>`)
+          .join('\n        ');
+
+        // Replace placeholders
+        const finalHTML = template
+          .replace(/{{FRIEND_NAME}}/g, friendName)
+          .replace(/{{IMAGE_DATA}}/g, base64Image)
+          .replace(/{{MESSAGE_PARAGRAPHS}}/g, messageParagraphs)
+          .replace(/{{SIGNATURE}}/g, signature);
+
+        // Create downloadable file
+        const blob = new Blob([finalHTML], { type: "text/html" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename + ".html";
+        a.click();
+        URL.revokeObjectURL(url);
+      } catch (err) {
+        alert("Error loading template.html: " + err.message);
+      }
+    }
+  </script>
+</body>
+</html>
