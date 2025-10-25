@@ -16,10 +16,14 @@
       align-items: center;
       justify-content: center;
       gap: 20px;
+      padding: 20px;
+      box-sizing: border-box;
     }
 
     h1 {
       color: #58a6ff;
+      text-align: center;
+      margin-bottom: 10px;
     }
 
     .container {
@@ -28,7 +32,8 @@
       border-radius: 12px;
       border: 1px solid #30363d;
       max-width: 500px;
-      width: 90%;
+      width: 100%;
+      box-sizing: border-box;
     }
 
     input[type="text"],
@@ -39,7 +44,7 @@
       padding: 12px;
       border-radius: 8px;
       width: 100%;
-      font-size: 15px;
+      font-size: 16px;
       outline: none;
       margin-bottom: 15px;
       box-sizing: border-box;
@@ -48,6 +53,7 @@
     textarea {
       height: 120px;
       resize: vertical;
+      font-family: inherit;
     }
 
     .file-upload {
@@ -58,6 +64,7 @@
       cursor: pointer;
       margin-bottom: 15px;
       transition: border-color 0.3s;
+      background: #0d1117;
     }
 
     .file-upload:hover {
@@ -68,20 +75,22 @@
       background: #238636;
       color: white;
       border: none;
-      padding: 12px 24px;
+      padding: 15px 24px;
       font-size: 16px;
       border-radius: 8px;
       cursor: pointer;
       transition: 0.2s;
       width: 100%;
+      font-weight: 600;
     }
 
     button:hover {
       background: #2ea043;
+      transform: translateY(-2px);
     }
 
     img {
-      max-width: 250px;
+      max-width: 100%;
       border-radius: 10px;
       border: 2px solid #30363d;
       margin-top: 10px;
@@ -89,9 +98,10 @@
     }
 
     footer {
-      margin-top: 30px;
+      margin-top: 20px;
       font-size: 14px;
       color: #8b949e;
+      text-align: center;
     }
 
     .form-group {
@@ -103,6 +113,21 @@
       margin-bottom: 8px;
       color: #c9d1d9;
       font-weight: 500;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+        gap: 15px;
+      }
+      
+      .container {
+        padding: 20px;
+      }
+      
+      h1 {
+        font-size: 1.5em;
+      }
     }
   </style>
 </head>
@@ -174,15 +199,18 @@ May all your dreams come true this year.</textarea>
     fileUpload.addEventListener('dragover', (e) => {
       e.preventDefault();
       fileUpload.style.borderColor = '#58a6ff';
+      fileUpload.style.background = '#0d1117';
     });
 
     fileUpload.addEventListener('dragleave', () => {
       fileUpload.style.borderColor = '#30363d';
+      fileUpload.style.background = '#0d1117';
     });
 
     fileUpload.addEventListener('drop', (e) => {
       e.preventDefault();
       fileUpload.style.borderColor = '#30363d';
+      fileUpload.style.background = '#0d1117';
       const file = e.dataTransfer.files[0];
       if (file && file.type.startsWith('image/')) {
         document.getElementById('imgInput').files = e.dataTransfer.files;
@@ -236,7 +264,9 @@ May all your dreams come true this year.</textarea>
         const a = document.createElement("a");
         a.href = url;
         a.download = filename + ".html";
+        document.body.appendChild(a);
         a.click();
+        document.body.removeChild(a);
         URL.revokeObjectURL(url);
       } catch (err) {
         alert("Error loading template.html: " + err.message);
